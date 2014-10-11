@@ -22,7 +22,7 @@ public class Main {
                             Map<String, Integer> freq = new HashMap<>();
                             while (scanner.hasNext()) {
                                 String word = scanner.next();
-                                freq.put(word, freq.getOrDefault(word, 0));
+                                freq.put(word, freq.getOrDefault(word, 0) + 1);
                             }
                             mails.add(new Mail(freq, isSpam(mailPath)));
                         } catch (IOException e) {
@@ -43,18 +43,18 @@ public class Main {
         File mailRoot = new File("bayes");
         List<Mail> mails = readMails(mailRoot);
         Collections.shuffle(mails);
-        int splitIndx = (int)(SPLIT_FACTOR * mails.size());
-        List<Mail> trainset = mails.subList(0, splitIndx);
-        List<Mail> testset = mails.subList(splitIndx, mails.size());
-        MailFilter mailFilter = new MailFilter(trainset);
-        System.out.println("Trainset correct percent: " + calcPercent(trainset, mailFilter));
-        System.out.println("Testset correct percent: " + calcPercent(testset, mailFilter));
+        int splitIndex = (int)(SPLIT_FACTOR * mails.size());
+        List<Mail> trainData = mails.subList(0, splitIndex);
+        List<Mail> testData = mails.subList(splitIndex, mails.size());
+        MailFilter mailFilter = new MailFilter(trainData);
+        System.out.printf("Recognized on train data %.2f%%\n", calcPercent(trainData, mailFilter));
+        System.out.printf("Recognized on test data %.2f%%\n", calcPercent(testData, mailFilter));
     }
 
     private static double calcPercent(List<Mail> mails, MailFilter filter) {
         int count = 0;
         for (Mail mail : mails)
             count += filter.isSpam(mail) == mail.isSpam() ? 1 : 0;
-        return 1. * count / mails.size();
+        return 100. * count / mails.size();
     }
 }
