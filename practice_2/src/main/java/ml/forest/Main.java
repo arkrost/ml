@@ -25,8 +25,8 @@ public class Main {
         List<LabeledSample> trainData = readLabeledSamples(TRAIN_DATA, TRAIN_LABELS);
         List<LabeledSample> testData = readLabeledSamples(TEST_DATA, TEST_LABELS);
         Node tree = Node.buildTree(trainData, MAX_DEPTH);
-        System.out.printf("Correct percent ont train data: %.2f\n", testClassifier(tree, trainData));
-        System.out.printf("Correct percent ont test data: %.2f\n", testClassifier(tree, testData));
+        System.out.printf("Correct percent on train data: %.2f\n", testClassifier(tree, trainData));
+        System.out.printf("Correct percent on test data: %.2f\n", testClassifier(tree, testData));
     }
 
     private static List<int[]> readSamples(Path path) {
