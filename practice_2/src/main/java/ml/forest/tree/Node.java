@@ -95,7 +95,7 @@ public abstract class Node implements Classifier {
                 == getFeature(featureID, samples.get(half))) {
             s2++;
         }
-        return half - s1 <= s2 - half ? half : s2;
+        return half - s1 <= s2 - half ? s1 + 1 : s2;
     }
 
     private static int getFeature(int id, LabeledSample sample) {
