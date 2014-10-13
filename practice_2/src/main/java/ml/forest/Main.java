@@ -20,13 +20,21 @@ public class Main {
     private static final Path TEST_DATA = DATA_ROOT.resolve("arcene_valid.data");
     private static final Path TEST_LABELS = DATA_ROOT.resolve("arcene_valid.labels");
     private static final int MAX_DEPTH = 10;
+    private static final int FOREST_SIZE = 9;
+    private static final int SAMPLES_COUNT = 90;
 
     public static void main(String[] args) {
         List<LabeledSample> trainData = readLabeledSamples(TRAIN_DATA, TRAIN_LABELS);
         List<LabeledSample> testData = readLabeledSamples(TEST_DATA, TEST_LABELS);
         Node tree = Node.buildTree(trainData, MAX_DEPTH);
+        System.out.println("Testing tree!");
         System.out.printf("Correct percent on train data: %.2f\n", testClassifier(tree, trainData));
         System.out.printf("Correct percent on test data: %.2f\n", testClassifier(tree, testData));
+
+        Forest forest = new Forest(FOREST_SIZE, SAMPLES_COUNT, MAX_DEPTH, trainData);
+        System.out.println("Testing forest!");
+        System.out.printf("Correct percent on train data: %.2f\n", testClassifier(forest, trainData));
+        System.out.printf("Correct percent on test data: %.2f\n", testClassifier(forest, testData));
     }
 
     private static List<int[]> readSamples(Path path) {
@@ -67,10 +75,10 @@ public class Main {
         return samples;
     }
 
-    private static  double testClassifier(Node node, List<LabeledSample> samples) {
+    private static  double testClassifier(Classifier classifier, List<LabeledSample> samples) {
         int count = 0;
         for (LabeledSample sample : samples) {
-            if (node.resolve(sample.getSample()) == sample.getLabel())
+            if (classifier.resolve(sample.getSample()) == sample.getLabel())
                 count++;
         }
         return  100. * count / samples.size();

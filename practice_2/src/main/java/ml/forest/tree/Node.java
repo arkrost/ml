@@ -1,17 +1,17 @@
 package ml.forest.tree;
 
+import ml.forest.Classifier;
 import ml.forest.LabeledSample;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
  * @author Arkadii Rost
  */
-public abstract class Node {
-    public abstract int resolve(int[] sample);
-
+public abstract class Node implements Classifier {
     public static Node buildTree(List<LabeledSample> samples, int depth) {
         if (depth > 0 && shouldTrySplit(samples)) {
             double featureCount = samples.get(0).getSample().length;
@@ -42,12 +42,15 @@ public abstract class Node {
         return new Leaf(mostFrequentLabel(samples));
     }
 
+    private static Map<Integer, List<LabeledSample>> groupByLabel(List<LabeledSample> samples) {
+        return samples.stream().collect(Collectors.groupingBy(LabeledSample::getLabel));
+    }
+
     private static int mostFrequentLabel(List<LabeledSample> samples) {
-        return samples.stream()
-            .collect(Collectors.groupingBy(LabeledSample::getLabel))
-            .entrySet().stream()
-            .max((e1, e2) -> Integer.compare(e1.getValue().size(), e2.getValue().size()))
-            .get().getKey();
+        return groupByLabel(samples)
+                .entrySet().stream()
+                .max((e1, e2) -> Integer.compare(e1.getValue().size(), e2.getValue().size()))
+                .get().getKey();
     }
 
     private static boolean shouldTrySplit(List<LabeledSample> samples) {
@@ -74,9 +77,7 @@ public abstract class Node {
 
     private static double gini(List<LabeledSample> samples) {
         double N = samples.size();
-        return samples.stream()
-                      .collect(Collectors.groupingBy(LabeledSample::getLabel))
-                      .values().stream()
+        return groupByLabel(samples).values().stream()
                       .mapToDouble(group -> group.size() * group.size() / N)
                       .sum();
     }
