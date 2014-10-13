@@ -33,10 +33,8 @@ public abstract class Node {
             }
             if (id != -1) {
                 samples.sort(new ByFeatureComparator(id));
-                List<LabeledSample> left = new ArrayList<>(split);
-                left.addAll(samples.subList(0, split));
-                List<LabeledSample> right = new ArrayList<>(samples.size() - split);
-                right.addAll(samples.subList(split, samples.size()));
+                List<LabeledSample> left = samples.subList(0, split);
+                List<LabeledSample> right = samples.subList(split, samples.size());
                 double c = 0.5 * (getFeature(id, samples.get(split - 1))
                         + getFeature(id, samples.get(split)));
                 return new Branch(id, c, buildTree(left, depth - 1), buildTree(right, depth - 1));
