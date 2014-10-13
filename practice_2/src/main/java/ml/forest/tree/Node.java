@@ -2,7 +2,6 @@ package ml.forest.tree;
 
 import ml.forest.LabeledSample;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -95,7 +94,7 @@ public abstract class Node {
                 == getFeature(featureID, samples.get(half))) {
             s2++;
         }
-        return half - s1 < s2 - half ? half : s2;
+        return half - s1 <= s2 - half ? half : s2;
     }
 
     private static int getFeature(int id, LabeledSample sample) {
