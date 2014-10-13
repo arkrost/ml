@@ -23,7 +23,7 @@ public abstract class Node {
                 if (!canSplitByFeature(i, samples))
                     continue;
                 int curSplit = splitInd(i, samples);
-                double g = gini(i, samples.subList(0, curSplit),
+                double g = gini(samples.subList(0, curSplit),
                         samples.subList(curSplit, samples.size()));
                 if (g > gini) {
                     gini = g;
@@ -71,14 +71,14 @@ public abstract class Node {
         return false;
     }
 
-    private static double gini(int featureID, List<LabeledSample> left, List<LabeledSample> right) {
-        return gini(featureID, left) + gini(featureID, right);
+    private static double gini(List<LabeledSample> left, List<LabeledSample> right) {
+        return gini(left) + gini(right);
     }
 
-    private static double gini(int featureID, List<LabeledSample> samples) {
+    private static double gini(List<LabeledSample> samples) {
         double N = samples.size();
         return samples.stream()
-                      .collect(Collectors.groupingBy(sample -> sample.getSample()[featureID]))
+                      .collect(Collectors.groupingBy(LabeledSample::getLabel))
                       .values().stream()
                       .mapToDouble(group -> group.size() * group.size() / N)
                       .sum();
