@@ -18,7 +18,7 @@ public class Main {
     private static final int ROW_COUNT = 1000;
 
     public static void main(String[] args) {
-        System.out.println(pca(readMatrix(BASIS3)));
+        System.out.println(pca(readMatrix(BASIS1)));
     }
 
     private static SimpleMatrix readMatrix(String path) {
@@ -47,6 +47,7 @@ public class Main {
     private static SimpleMatrix pca(SimpleMatrix m) {
         SimpleMatrix x = new SimpleMatrix(m);
         centrify(x);
+        norm(x);
         SimpleMatrix c = cov(x).scale(1.0 / (COLUMN_COUNT - 1));
         SimpleSVD svd = c.svd();
         int l = selectL(svd.getW());
@@ -60,6 +61,17 @@ public class Main {
                 avg += m.get(i, j) / m.numRows();
             for (int i = 0; i < m.numRows(); i++)
                 m.set(i, j, m.get(i, j) - avg);
+        }
+    }
+
+    private static void norm(SimpleMatrix m) {
+        for (int j = 0; j < m.numCols(); j++) {
+            double w = 0;
+            for (int i = 0; i < m.numRows(); i++)
+                w += m.get(i, j) * m.get(i, j);
+            w = Math.sqrt(w);
+            for (int i = 0; i < m.numRows(); i++)
+                m.set(i, j, m.get(i, j) / w);
         }
     }
 
