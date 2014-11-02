@@ -17,7 +17,7 @@ public class Forest implements Classifier {
         trees = new Node[size];
         Random random = new Random();
         for (int i = 0; i < size; i++)
-            trees[i] = Node.buildTree(genRandomSamples(samples, m, random), depth);
+            trees[i] = Node.buildTree(random, genRandomSamples(samples, m, random), depth);
     }
 
     private static List<LabeledSample> genRandomSamples(List<LabeledSample> samples,

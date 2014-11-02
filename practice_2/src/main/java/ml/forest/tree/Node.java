@@ -3,22 +3,20 @@ package ml.forest.tree;
 import ml.forest.Classifier;
 import ml.forest.LabeledSample;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * @author Arkadii Rost
  */
 public abstract class Node implements Classifier {
-    public static Node buildTree(List<LabeledSample> samples, int depth) {
+    public static Node buildTree(Random r, List<LabeledSample> samples, int depth) {
         if (depth > 0 && shouldTrySplit(samples)) {
-            double featureCount = samples.get(0).getSample().length;
+            int featureCount = samples.get(0).getSample().length;
             int id = -1;
             int split = -1;
             double gini = Double.NEGATIVE_INFINITY;
-            for (int i = 0; i < featureCount; i++) {
+            for (int i : getRandomFeatures(r, featureCount)) {
                 if (!canSplitByFeature(i, samples))
                     continue;
                 int curSplit = splitInd(i, samples);
@@ -36,10 +34,18 @@ public abstract class Node implements Classifier {
                 List<LabeledSample> right = samples.subList(split, samples.size());
                 double c = 0.5 * (getFeature(id, samples.get(split - 1))
                         + getFeature(id, samples.get(split)));
-                return new Branch(id, c, buildTree(left, depth - 1), buildTree(right, depth - 1));
+                return new Branch(id, c, buildTree(r, left, depth - 1), buildTree(r, right, depth - 1));
             }
         }
         return new Leaf(mostFrequentLabel(samples));
+    }
+
+    private static Collection<Integer> getRandomFeatures(Random r, int featureCount) {
+        int size = (int)Math.sqrt(featureCount);
+        Set<Integer> indexes = new HashSet<>(size);
+        while (indexes.size() < size)
+            indexes.add(r.nextInt(featureCount));
+        return indexes;
     }
 
     private static Map<Integer, List<LabeledSample>> groupByLabel(List<LabeledSample> samples) {
