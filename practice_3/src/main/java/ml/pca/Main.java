@@ -18,7 +18,19 @@ public class Main {
     private static final int ROW_COUNT = 1000;
 
     public static void main(String[] args) {
-        System.out.println(pca(readMatrix(BASIS1)));
+        double[][] matrix = new double[][] {
+                {7, 4, 3},
+                {4, 1, 8},
+                {6, 3, 5},
+                {8, 6, 1},
+                {8, 5, 7},
+                {7, 2, 9},
+                {5, 3, 3},
+                {9, 5, 8},
+                {7, 4, 5},
+                {8, 2, 2}
+        };
+        System.out.println(pca(new SimpleMatrix(matrix)));
     }
 
     private static SimpleMatrix readMatrix(String path) {
@@ -46,15 +58,15 @@ public class Main {
 
     private static SimpleMatrix pca(SimpleMatrix m) {
         SimpleMatrix x = new SimpleMatrix(m);
-        centrify(x);
+        center(x);
         norm(x);
-        SimpleMatrix c = cov(x).scale(1.0 / (COLUMN_COUNT - 1));
+        SimpleMatrix c = cov(x).scale(1.0 / (m.numRows() - 1));
         SimpleSVD svd = c.svd();
-        int l = selectL(svd.getW());
+        int l = 3;//selectL(svd.getW());
         return x.mult(slim(svd.getV(), l));
     }
 
-    private static void centrify(SimpleMatrix m) {
+    private static void center(SimpleMatrix m) {
         for (int j = 0; j < m.numCols(); j++) {
             double avg = 0;
             for (int i = 0; i < m.numRows(); i++)
@@ -69,7 +81,7 @@ public class Main {
             double w = 0;
             for (int i = 0; i < m.numRows(); i++)
                 w += m.get(i, j) * m.get(i, j);
-            w = Math.sqrt(w);
+            w = Math.sqrt(w / (m.numRows() - 1));
             for (int i = 0; i < m.numRows(); i++)
                 m.set(i, j, m.get(i, j) / w);
         }
