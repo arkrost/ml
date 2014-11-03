@@ -18,19 +18,12 @@ public class Main {
     private static final int ROW_COUNT = 1000;
 
     public static void main(String[] args) {
-        double[][] matrix = new double[][] {
-                {7, 4, 3},
-                {4, 1, 8},
-                {6, 3, 5},
-                {8, 6, 1},
-                {8, 5, 7},
-                {7, 2, 9},
-                {5, 3, 3},
-                {9, 5, 8},
-                {7, 4, 5},
-                {8, 2, 2}
-        };
-        System.out.println(pca(new SimpleMatrix(matrix)));
+        System.out.println("Basis 1");
+        System.out.println(pca(readMatrix(BASIS1)));
+        System.out.println("Basis 2");
+        System.out.println(pca(readMatrix(BASIS2)));
+        System.out.println("Basis 3");
+        System.out.println(pca(readMatrix(BASIS3)));
     }
 
     private static SimpleMatrix readMatrix(String path) {
@@ -48,22 +41,22 @@ public class Main {
         return matrix;
     }
 
-    private static SimpleMatrix cov(SimpleMatrix matrix) {
-        return matrix.transpose().mult(matrix);
-    }
-
     private static SimpleMatrix slim(SimpleMatrix w, int l) {
         return w.extractMatrix(0, w.numRows(), 0, l);
     }
 
     private static SimpleMatrix pca(SimpleMatrix m) {
+        SimpleMatrix x = scale(m);
+        SimpleSVD svd = x.svd();
+        int l = selectL(svd);
+        return slim(svd.getV(), l);
+    }
+
+    private static SimpleMatrix scale(SimpleMatrix m) {
         SimpleMatrix x = new SimpleMatrix(m);
         center(x);
         norm(x);
-        SimpleMatrix c = cov(x).scale(1.0 / (m.numRows() - 1));
-        SimpleSVD svd = c.svd();
-        int l = 3;//selectL(svd.getW());
-        return x.mult(slim(svd.getV(), l));
+        return x;
     }
 
     private static void center(SimpleMatrix m) {
@@ -87,7 +80,11 @@ public class Main {
         }
     }
 
-    private static int selectL(SimpleMatrix w) {
+    private static int selectL(SimpleSVD svd) {
+        int numRows = svd.getW().numRows();
+        int numCols = svd.getW().numCols();
+        SimpleMatrix w = svd.getW().extractMatrix(0, numCols, 0, numCols);
+        w = w.mult(w).scale(1. / (numRows - 1));
         double avgLambda  = w.trace() / w.numRows();
         int i = 0;
         while (w.get(i, i) > avgLambda)
