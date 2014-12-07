@@ -22,9 +22,10 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
+        <module name="practice_2" />
         <module name="practice_3" />
+        <module name="practice_4" />
       </profile>
     </annotationProcessing>
   </component>
 </project>
-
