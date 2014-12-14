@@ -4,6 +4,10 @@
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/.idea" />
+      <excludeFolder url="file://$MODULE_DIR$/practice_2/target" />
+      <excludeFolder url="file://$MODULE_DIR$/practice_3/target" />
+      <excludeFolder url="file://$MODULE_DIR$/practice_4/target" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
