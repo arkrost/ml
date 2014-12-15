@@ -3,7 +3,7 @@ package ml.bayesian_net;
 import java.util.HashMap;
 import java.util.Map;
 
-class Factor {
+public class Factor {
     private final int varMask;
     private final Map<Integer, Double> mapping;
 
