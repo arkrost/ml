@@ -1,5 +1,7 @@
 package ml.bayesian_net;
 
+import ml.bayesian_net.visitors.NetVisitor;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -34,6 +36,10 @@ public class BayesianNetwork {
         links[from][to] = true;
     }
 
+    public void visit(NetVisitor visitor) {
+        visitor.visit(factors, links, vars);
+    }
+
     public void setFactor(int i, Factor factor) {
         factors[i] = factor;
     }
@@ -58,29 +64,30 @@ public class BayesianNetwork {
             int u = minAffectingVariable(v, fixedVars, factors);
             fixedVars ^= vars[u];
             List<Factor> affected = affectedFactors(factors, u);
+            if (affected.isEmpty())
+                continue;
             Factor newFactor = fold(affected).marginal(vars[u]);
             factors.removeAll(affected);
             if (!newFactor.isConstant())
                 factors.add(newFactor);
         }
-        if (factors.size() != 1)
-            throw new IllegalStateException("Something go wrong");
-        Factor res = factors.iterator().next();
+        Factor res = fold(factors);
         double p = res.get(vars[v]);
         return p / (p + res.get(0));
     }
 
     private Set<Factor> getFactorSet(int mask, int val) {
         return Stream.of(this.factors)
-                .map(f -> f.fix(mask, val).marginal(mask))
+                .map(f -> f.fix(mask, val))
+                .filter(f -> !f.isConstant())
                 .collect(Collectors.toSet());
     }
 
-    private Factor fold(List<Factor> factors) {
-        Factor acc = factors.get(0);
-        if (factors.size() == 1)
+    private Factor fold(Iterable<Factor> factors) {
+        Iterator<Factor> iterator = factors.iterator();
+        Factor acc = iterator.next();
+        if (!iterator.hasNext())
             return acc;
-        Iterator<Factor> iterator = factors.listIterator(1);
         while (iterator.hasNext())
             acc = acc.compose(iterator.next());
         return acc;

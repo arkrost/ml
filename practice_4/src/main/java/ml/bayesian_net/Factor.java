@@ -25,12 +25,11 @@ public class Factor {
     }
 
     public Factor marginal(int mask) {
-        mask &= varMask;
-        if (mask == 0)
-            return this;
+        if (!isSubMask(mask))
+            throw new IllegalStateException("Can't marginal: not sub mask");
         Map<Integer, Double> newMapping = new HashMap<>(1 << Integer.bitCount(mask));
         for (Map.Entry<Integer, Double> e : mapping.entrySet()) {
-            int ind = e.getKey() & mask;
+            int ind = e.getKey() ^ (e.getKey() & mask);
             newMapping.put(ind, e.getValue() + newMapping.getOrDefault(ind, 0.));
         }
         return new Factor(varMask ^ mask, newMapping);
@@ -61,7 +60,7 @@ public class Factor {
         for (Map.Entry<Integer, Double> e : mapping.entrySet()) {
             int ind = e.getKey() & subMask;
             if (ind == val)
-                newMapping.put(ind, e.getValue());
+                newMapping.put(e.getKey() ^ ind, e.getValue());
         }
         return new Factor(varMask ^ subMask, newMapping);
     }
