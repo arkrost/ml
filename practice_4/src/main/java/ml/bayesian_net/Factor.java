@@ -16,15 +16,24 @@ public class Factor {
         return mapping.get(vm & varMask);
     }
 
-    public Factor marginalTo(int mask) {
-        if ((mask | varMask) != varMask)
-            throw new IllegalStateException("Expect submask to marginal");
+    public boolean isSubMask(int mask) {
+        return (mask | varMask) == varMask;
+    }
+
+    public boolean isConstant() {
+        return varMask == 0;
+    }
+
+    public Factor marginal(int mask) {
+        mask &= varMask;
+        if (mask == 0)
+            return this;
         Map<Integer, Double> newMapping = new HashMap<>(1 << Integer.bitCount(mask));
         for (Map.Entry<Integer, Double> e : mapping.entrySet()) {
             int ind = e.getKey() & mask;
             newMapping.put(ind, e.getValue() + newMapping.getOrDefault(ind, 0.));
         }
-        return new Factor(mask, newMapping);
+        return new Factor(varMask ^ mask, newMapping);
     }
 
     public Factor compose(Factor f) {
@@ -45,6 +54,8 @@ public class Factor {
 
     public Factor fix(int subMask, int val) {
         subMask &= varMask;
+        if (subMask == 0)
+            return this;
         val &= varMask;
         Map<Integer, Double> newMapping = new HashMap<>();
         for (Map.Entry<Integer, Double> e : mapping.entrySet()) {

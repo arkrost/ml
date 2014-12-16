@@ -57,6 +57,20 @@ public class Main {
                 if (!mapping.isEmpty())
                     net.setFactor(u, new Factor(mask, mapping));
             }
+            nextLine = reader.readLine();
+            String[] fixed = getElements(nextLine);
+            int mask = 0;
+            int val = 0;
+            for (String f : fixed) {
+                if (f.charAt(0) == '!') {
+                    mask |= net.getMask(Integer.parseInt(f.substring(1)));
+                } else {
+                    int vMask = net.getMask(Integer.parseInt(f));
+                    mask |= vMask;
+                    val |= vMask;
+                }
+            }
+            double[] aposteri = net.eliminate(mask, val);
         } catch (IOException e) {
             e.printStackTrace();
         }
